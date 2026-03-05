@@ -32,3 +32,4 @@ knowledge_base/**/*.pdf
 # 其他
 *.log
 .env.local
+training/dataset/train.jsonl
