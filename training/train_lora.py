@@ -17,20 +17,23 @@ import json
 from pathlib import Path
 
 # ── 配置 ──────────────────────────────────────────────────────────
-BASE_MODEL = os.environ.get("BASE_MODEL", "Qwen/Qwen3.5-0.8B")
+# 模型选择：
+#   - Qwen/Qwen2.5-0.5B-Instruct (推荐: 小巧、兼容性好)
+#   - Qwen/Qwen3.5-0.8B (新架构，内存占用大)
+BASE_MODEL = os.environ.get("BASE_MODEL", "Qwen/Qwen2.5-0.5B-Instruct")
 DATASET_PATH = Path(__file__).parent / "dataset" / "train.jsonl"
 OUTPUT_DIR = Path(__file__).parent / "output"
 LORA_OUTPUT = OUTPUT_DIR / "petafu-vet-lora"
 MERGED_OUTPUT = OUTPUT_DIR / "petafu-vet-merged"
 
-# 训练超参数
+# 训练超参数（针对 T4 15GB 优化）
 EPOCHS = 3
-BATCH_SIZE = 4
-GRAD_ACCUM = 4
+BATCH_SIZE = 2          # 降低以节省内存
+GRAD_ACCUM = 4          # 保持有效 batch size = 8
 LEARNING_RATE = 2e-4
 LORA_RANK = 16
 LORA_ALPHA = 32
-MAX_SEQ_LEN = 1024
+MAX_SEQ_LEN = 512       # 降低以节省内存
 
 
 def load_dataset_from_jsonl(path: str):
