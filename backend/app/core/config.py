@@ -14,6 +14,13 @@ class Settings(BaseSettings):
     openai_api_base: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     llm_model: str = "gemini-2.0-flash"
 
+    # LLM Provider 切换（gemini / ollama / local）
+    llm_provider: str = "gemini"
+
+    # Ollama / llama.cpp（本地模型）
+    ollama_base_url: str = "http://localhost:11434/v1"
+    ollama_model: str = "qwen3.5:0.8b"
+
     # 微信小程序
     wx_appid: str = ""
     wx_secret: str = ""
