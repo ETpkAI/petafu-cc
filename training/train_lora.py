@@ -1,25 +1,29 @@
 """
-LoRA 微调 Qwen3.5 — 宠物阿福兽医助手
+LoRA 微调 Qwen2.5 — 宠物阿福兽医助手
 
 使用 unsloth 加速微调（如无 GPU 可在 Google Colab 上运行）
-支持模型: Qwen/Qwen3.5-0.8B, Qwen/Qwen3.5-2B
+支持模型: Qwen/Qwen2.5-0.5B-Instruct, Qwen/Qwen2.5-1.5B-Instruct
 
 用法:
   # 本地 GPU
   python train_lora.py
 
   # Google Colab (在 notebook 中)
-  !pip install unsloth
-  %run train_lora.py
+  !pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+  !python train_lora.py
 """
 import os
 import json
+import torch
 from pathlib import Path
+
+# 修复 unsloth 兼容性问题
+os.environ["UNSLOTH_DISABLE_FAST_COMPILE"] = "1"
 
 # ── 配置 ──────────────────────────────────────────────────────────
 # 模型选择：
 #   - Qwen/Qwen2.5-0.5B-Instruct (推荐: 小巧、兼容性好)
-#   - Qwen/Qwen3.5-0.8B (新架构，内存占用大)
+#   - Qwen/Qwen2.5-1.5B-Instruct (更大更聪明，需要更多内存)
 BASE_MODEL = os.environ.get("BASE_MODEL", "Qwen/Qwen2.5-0.5B-Instruct")
 DATASET_PATH = Path(__file__).parent / "dataset" / "train.jsonl"
 OUTPUT_DIR = Path(__file__).parent / "output"
@@ -93,7 +97,7 @@ def main():
             "q_proj", "k_proj", "v_proj", "o_proj",
             "gate_proj", "up_proj", "down_proj",
         ],
-        lora_dropout=0.05,
+        lora_dropout=0,  # 改为 0 以兼容 unsloth
         bias="none",
         use_gradient_checkpointing="unsloth",
     )
@@ -108,6 +112,9 @@ def main():
     from transformers import TrainingArguments
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # 检测是否支持 bf16
+    use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
 
     trainer = SFTTrainer(
         model=model,
@@ -124,7 +131,8 @@ def main():
             lr_scheduler_type="cosine",
             warmup_ratio=0.1,
             weight_decay=0.01,
-            fp16=True,
+            fp16=not use_bf16,
+            bf16=use_bf16,
             logging_steps=10,
             save_strategy="epoch",
             seed=42,
