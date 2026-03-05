@@ -2,7 +2,7 @@
 LoRA 微调 Qwen3.5 — 宠物阿福兽医助手
 
 使用 unsloth 加速微调（如无 GPU 可在 Google Colab 上运行）
-支持模型: Qwen/Qwen3.5-0.5B-Instruct, Qwen/Qwen3.5-1.5B-Instruct
+支持模型: Qwen/Qwen3.5-0.8B, Qwen/Qwen3.5-2B
 
 用法:
   # 本地 GPU
@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 
 # ── 配置 ──────────────────────────────────────────────────────────
-BASE_MODEL = os.environ.get("BASE_MODEL", "Qwen/Qwen3.5-0.5B-Instruct")
+BASE_MODEL = os.environ.get("BASE_MODEL", "Qwen/Qwen3.5-0.8B")
 DATASET_PATH = Path(__file__).parent / "dataset" / "train.jsonl"
 OUTPUT_DIR = Path(__file__).parent / "output"
 LORA_OUTPUT = OUTPUT_DIR / "petafu-vet-lora"
